@@ -48,50 +48,23 @@ namespace Obvs
             _serviceBusClient = serviceBusClient;
         }
 
-        public IObservable<IEvent> Events
-        {
-            get { return _serviceBusClient.Events; }
-        }
+        public IObservable<IEvent> Events => _serviceBusClient.Events;
 
-        public Task SendAsync(ICommand command)
-        {
-            return _serviceBusClient.SendAsync(command);
-        }
+        public Task SendAsync(ICommand command) => _serviceBusClient.SendAsync(command);
 
-        public Task SendAsync(IEnumerable<ICommand> commands)
-        {
-            return _serviceBusClient.SendAsync(commands);
-        }
+        public Task SendAsync(IEnumerable<ICommand> commands) => _serviceBusClient.SendAsync(commands);
 
-        public IObservable<IResponse> GetResponses(IRequest request)
-        {
-            return _serviceBusClient.GetResponses(request);
-        }
+        public IObservable<IResponse> GetResponses(IRequest request) => _serviceBusClient.GetResponses(request);
 
-        public IObservable<T> GetResponses<T>(IRequest request) where T : IResponse
-        {
-            return _serviceBusClient.GetResponses<T>(request);
-        }
+        public IObservable<T> GetResponses<T>(IRequest request) where T : IResponse => _serviceBusClient.GetResponses<T>(request);
 
-        public IObservable<T> GetResponse<T>(IRequest request) where T : IResponse
-        {
-            return _serviceBusClient.GetResponse<T>(request);
-        }
+        public IObservable<T> GetResponse<T>(IRequest request) where T : IResponse => _serviceBusClient.GetResponse<T>(request);
 
-        public IObservable<Exception> Exceptions
-        {
-            get { return _serviceBusClient.Exceptions; }
-        }
+        public IObservable<Exception> Exceptions => _serviceBusClient.Exceptions;
 
-        public IDisposable Subscribe(object subscriber, IScheduler scheduler = null)
-        {
-            return _serviceBusClient.Subscribe(subscriber, scheduler);
-        }
+        public IDisposable Subscribe(object subscriber, IScheduler scheduler = null) => _serviceBusClient.Subscribe(subscriber, scheduler);
 
-        public void Dispose()
-        {
-            ((IDisposable)_serviceBusClient).Dispose();
-        }
+        public void Dispose() => ((IDisposable)_serviceBusClient).Dispose();
     }
 
     public class ServiceBusClient<TMessage, TCommand, TEvent, TRequest, TResponse> : ServiceBusErrorHandlingBase<TMessage, TCommand, TEvent, TRequest, TResponse>, IServiceBusClient<TMessage, TCommand, TEvent, TRequest, TResponse>
@@ -103,7 +76,6 @@ namespace Obvs
     {
         protected readonly IEnumerable<IServiceEndpoint<TMessage, TCommand, TEvent, TRequest, TResponse>> Endpoints;
         private readonly IEnumerable<IServiceEndpointClient<TMessage, TCommand, TEvent, TRequest, TResponse>> _endpointClients;
-        private readonly IObservable<TEvent> _events;
         private readonly IRequestCorrelationProvider<TRequest, TResponse> _requestCorrelationProvider;
         private readonly List<KeyValuePair<object, IObservable<TMessage>>> _subscribers;
         private readonly IMessageBus<TMessage> _localBus;
@@ -121,41 +93,39 @@ namespace Obvs
 
             _endpointClients = endpointClients.ToArray();
 
-            _events = _endpointClients
-                .Select(endpointClient => endpointClient.EventsWithErrorHandling(_exceptions))
-                .Merge()
-                .Merge(GetLocalMessages<TEvent>())
+            Events = Observable.Merge(
+                    _endpointClients
+                        .Select(endpointClient => endpointClient.EventsWithErrorHandling(_exceptions))
+                        .Merge(), 
+                    GetLocalMessages<TEvent>())
                 .PublishRefCountRetriable();
 
             _requestCorrelationProvider = requestCorrelationProvider;
             _subscribers = new List<KeyValuePair<object, IObservable<TMessage>>>();
         }
 
-        public IObservable<TEvent> Events
-        {
-            get { return _events; }
-        }
+        public IObservable<TEvent> Events { get; }
 
-        public Task SendAsync(TCommand command)
+        public async Task SendAsync(TCommand command)
         {
             List<Exception> exceptions = new List<Exception>();
 
             var tasks = EndpointClientsThatCanHandle(command)
-                .Select(endpoint => Catch(() => endpoint.SendAsync(command), exceptions, CommandErrorMessage(endpoint)))
-                .Union(PublishLocal(command, exceptions))
+                .Select(endpoint => CatchAsync(() => endpoint.SendAsync(command), exceptions, CommandErrorMessage(endpoint)))
+                .Concat(PublishLocal(command, exceptions))
                 .ToArray();
+
+            if (tasks.Length == 0)
+            {
+                throw new Exception($"No endpoint or local bus configured for {command}, please check your ServiceBus configuration.");
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             if (exceptions.Any())
             {
                 throw new AggregateException(CommandErrorMessage(command), exceptions);
             }
-
-            if (tasks.Length == 0)
-            {
-                throw new Exception(string.Format("No endpoint or local bus configured for {0}, please check your ServiceBus configuration.", command));
-            }
-
-            return Task.WhenAll(tasks);
         }
 
         protected IObservable<T> GetLocalMessages<T>()
@@ -165,7 +135,7 @@ namespace Obvs
 
         protected IEnumerable<Task> PublishLocal(TMessage message, List<Exception> exceptions)
         {
-            return ShouldPublishLocally(message) ? new[] {Catch(() => _localBus.PublishAsync(message), exceptions)} : 
+            return ShouldPublishLocally(message) ? new[] { CatchAsync(() => _localBus.PublishAsync(message), exceptions) } : 
                                                    Enumerable.Empty<Task>();
         }
 
@@ -192,28 +162,28 @@ namespace Obvs
             return false;
         }
 
-        public Task SendAsync(IEnumerable<TCommand> commands)
+        public async Task SendAsync(IEnumerable<TCommand> commands)
         {
-            var commandsResovled = commands.ToArray();
+            var commandResolved = commands.ToArray();
 
-            if (commandsResovled.Length == 0)
-                return Task.FromResult(true);
+            if (commandResolved.Length == 0)
+                return;
 
             var exceptions = new List<Exception>();
             
-            var tasks = commandsResovled.Select(command => Catch(() => SendAsync(command), exceptions)).ToArray();
-
-            if (exceptions.Any())
-            {
-                throw new AggregateException(CommandErrorMessage(), exceptions.SelectMany(_ => _ is AggregateException ? (IList<Exception>)((AggregateException)_).InnerExceptions : new []{_}));
-            }
+            var tasks = commandResolved.Select(command => CatchAsync(() => SendAsync(command), exceptions)).ToArray();
 
             if (tasks.Length == 0)
             {
                 throw new Exception("No endpoint or local bus configured for any of these commands, please check your ServiceBus configuration.");
             }
 
-            return Task.WhenAll(tasks);
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            if (exceptions.Any())
+            {
+                throw new AggregateException(CommandErrorMessage(), exceptions.SelectMany(e => e is AggregateException ae ? (IList<Exception>)ae.InnerExceptions : new[] { e }));
+            }
         }
 
         public IObservable<TResponse> GetResponses(TRequest request)
@@ -225,11 +195,11 @@ namespace Obvs
 
             _requestCorrelationProvider.SetRequestCorrelationIds(request);
 
-            return EndpointClientsThatCanHandle(request)
-                .Select(endpoint => endpoint.GetResponses(request)
-                .Where(response => _requestCorrelationProvider.AreCorrelated(request, response)))
-                .Merge()
-                .Merge(GetLocalResponses(request))
+            return Observable.Merge(
+                    EndpointClientsThatCanHandle(request)
+                        .Select(endpoint => endpoint.GetResponses(request).Where(response => _requestCorrelationProvider.AreCorrelated(request, response)))
+                        .Merge(), 
+                    GetLocalResponses(request))
                 .PublishRefCountRetriable();
         }
 
@@ -239,7 +209,9 @@ namespace Obvs
             {
                 return Observable.Create<TResponse>(observer =>
                 {
-                    IDisposable disposable = _localBus.Messages.OfType<TResponse>()
+                    IDisposable disposable = _localBus
+                        .Messages
+                        .OfType<TResponse>()
                         .Where(response => _requestCorrelationProvider.AreCorrelated(request, response))
                         .Subscribe(observer);
 
@@ -248,6 +220,7 @@ namespace Obvs
                     return disposable;
                 });
             }
+
             return Observable.Empty<TResponse>();
         }
 
@@ -260,6 +233,13 @@ namespace Obvs
         {
             return GetResponses(request).OfType<T>().Take(1);
         }
+
+        private IEnumerable<IServiceEndpointClient<TMessage, TCommand, TEvent, TRequest, TResponse>> EndpointClientsThatCanHandle(TMessage message)
+        {
+            return _endpointClients.Where(endpoint => endpoint.CanHandle(message));
+        }
+
+        #region Subscribe to event using object with methods
 
         public virtual IDisposable Subscribe(object subscriber, IScheduler scheduler = null)
         {
@@ -293,7 +273,7 @@ namespace Obvs
 
             var subscriberType = subscriber.GetType();
             var methodHandlers = subscriberType.GetSubscriberMethods<TCommand, TEvent, TRequest, TResponse>();
-            
+
             var voidTypeInfo = typeof(void).GetTypeInfo();
 
             var subscription = new CompositeDisposable();
@@ -354,28 +334,28 @@ namespace Obvs
             return subscription;
         }
 
-//        
-//        private static Action<object, TParamType> CreateSubscriberAction<TParamType>(Type subscriberType, MethodInfo methodInfo)
-//        {
-//            var targetObj = Expression.Parameter(typeof(object));
-//            var parameter = Expression.Parameter(typeof(TParamType));
-//            
-//            var castTarget = Expression.Convert(targetObj, subscriberType);
-//            var call = Expression.Call(castTarget, methodInfo, parameter);
-//
-//            return Expression.Lambda<Action<object, TParamType>>(call, targetObj, parameter).Compile();
-//        }
-//
-//        private static Func<object, TParamType, TReturnType> CreateSubscriberFunc<TParamType, TReturnType>(Type subscriberType, MethodInfo methodInfo)
-//        {
-//            var targetObj = Expression.Parameter(typeof(object));
-//            var parameter = Expression.Parameter(typeof(TParamType));
-//            
-//            var castTarget = Expression.Convert(targetObj, subscriberType);
-//            var call = Expression.Call(castTarget, methodInfo, parameter);
-//
-//            return Expression.Lambda<Func<object, TParamType, TReturnType>>(call, targetObj, parameter).Compile();
-//        }
+        //        
+        //        private static Action<object, TParamType> CreateSubscriberAction<TParamType>(Type subscriberType, MethodInfo methodInfo)
+        //        {
+        //            var targetObj = Expression.Parameter(typeof(object));
+        //            var parameter = Expression.Parameter(typeof(TParamType));
+        //            
+        //            var castTarget = Expression.Convert(targetObj, subscriberType);
+        //            var call = Expression.Call(castTarget, methodInfo, parameter);
+        //
+        //            return Expression.Lambda<Action<object, TParamType>>(call, targetObj, parameter).Compile();
+        //        }
+        //
+        //        private static Func<object, TParamType, TReturnType> CreateSubscriberFunc<TParamType, TReturnType>(Type subscriberType, MethodInfo methodInfo)
+        //        {
+        //            var targetObj = Expression.Parameter(typeof(object));
+        //            var parameter = Expression.Parameter(typeof(TParamType));
+        //            
+        //            var castTarget = Expression.Convert(targetObj, subscriberType);
+        //            var call = Expression.Call(castTarget, methodInfo, parameter);
+        //
+        //            return Expression.Lambda<Func<object, TParamType, TReturnType>>(call, targetObj, parameter).Compile();
+        //        }
 
         private static Action<object, TParamType> CreateSubscriberAction<TParamType>(Type subscriberType, MethodInfo methodInfo)
         {
@@ -404,11 +384,8 @@ namespace Obvs
 
             return (Func<object, TParamType, TReturnType>)shim.CreateDelegate(typeof(Func<object, TParamType, TReturnType>));
         }
+        #endregion
 
-        private IEnumerable<IServiceEndpointClient<TMessage, TCommand, TEvent, TRequest, TResponse>> EndpointClientsThatCanHandle(TMessage message)
-        {
-            return _endpointClients.Where(endpoint => endpoint.CanHandle(message)).ToArray();
-        }
 
         public override void Dispose()
         {

@@ -20,39 +20,36 @@ namespace Obvs
             _exceptions = new Subject<Exception>();
         }
 
-        public IObservable<Exception> Exceptions
-        {
-            get { return _exceptions; }
-        }
+        public IObservable<Exception> Exceptions => _exceptions;
 
         protected static string EventErrorMessage(IEndpoint<TMessage> endpoint)
         {
-            return string.Format("Error publishing event to endpoint {0}", endpoint.GetType().FullName);
+            return $"Error publishing event to endpoint {endpoint.GetType().FullName}";
         }
 
         protected static string ReplyErrorMessage(IEndpoint<TMessage> endpoint)
         {
-            return string.Format("Error sending response to endpoint {0}", endpoint.GetType().FullName);
+            return $"Error sending response to endpoint {endpoint.GetType().FullName}";
         }
 
         protected static string CommandErrorMessage(IEndpoint<TMessage> endpoint)
         {
-            return string.Format("Error sending command to endpoint {0}", endpoint.GetType().FullName);
+            return $"Error sending command to endpoint {endpoint.GetType().FullName}";
         }
 
         protected static string EventErrorMessage(TEvent ev)
         {
-            return string.Format("Error publishing event {0}", ev);
+            return $"Error publishing event {ev}";
         }
 
         protected static string ReplyErrorMessage(TRequest request, TResponse response)
         {
-            return string.Format("Error replying to request {0} with response {1}", request, response);
+            return $"Error replying to request {request} with response {response}";
         }
 
         protected static string CommandErrorMessage(TCommand command)
         {
-            return string.Format("Error sending command {0}", command);
+            return $"Error sending command {command}";
         }
 
         protected static string CommandErrorMessage()
@@ -72,17 +69,16 @@ namespace Obvs
             }
         }
 
-        protected Task Catch(Func<Task> func, List<Exception> exceptions, string message = null)
+        protected async Task CatchAsync(Func<Task> func, List<Exception> exceptions, string message = null)
         {
             try
             {
-                return func();
+                await func().ConfigureAwait(false);
             }
             catch (Exception exception)
             {
                 exceptions.Add(message == null ? exception : new Exception(message, exception));
             }
-            return Task.FromResult(false);
         }
 
         public virtual void Dispose()

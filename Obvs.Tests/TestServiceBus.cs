@@ -15,11 +15,10 @@ using Xunit;
 
 namespace Obvs.Tests
 {
-    
     public class TestServiceBus
     {
         [Fact]
-        public void ShouldOnlySubscribeToUnderlyingEndpointRequestsOnce()
+        public  async Task ShouldOnlySubscribeToUnderlyingEndpointRequestsOnce()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -51,7 +50,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldOnlySubscribeToUnderlyingEndpointCommandsOnce()
+        public  async Task ShouldOnlySubscribeToUnderlyingEndpointCommandsOnce()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -83,7 +82,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldOnlySubscribeToUnderlyingEndpointEventsOnce()
+        public  async Task ShouldOnlySubscribeToUnderlyingEndpointEventsOnce()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -116,7 +115,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldOnlySubscribeToUnderlyingMessageSourceEventsOnce()
+        public  async Task ShouldOnlySubscribeToUnderlyingMessageSourceEventsOnce()
         {
             var messageSource1 = A.Fake<IMessageSource<IEvent>>();
             var messageSource2 = A.Fake<IMessageSource<IEvent>>();
@@ -182,7 +181,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldOnlySubscribeToUnderlyingEndpointResponsesOnce()
+        public  async Task ShouldOnlySubscribeToUnderlyingEndpointResponsesOnce()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -221,7 +220,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldReturnRequestsFromUnderlyingEndpoints()
+        public  async Task ShouldReturnRequestsFromUnderlyingEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -266,7 +265,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldReturnCommandsFromUnderlyingEndpoints()
+        public  async Task ShouldReturnCommandsFromUnderlyingEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -311,7 +310,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldReturnEventsFromUnderlyingEndpoints()
+        public  async Task ShouldReturnEventsFromUnderlyingEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -356,7 +355,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldReturnResponsesFromUnderlyingEndpoints()
+        public  async Task ShouldReturnResponsesFromUnderlyingEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -413,7 +412,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldDisposeUnderlyingRequestSubscriptionOnlyWhenAllSubscriptionsDisposed()
+        public  async Task ShouldDisposeUnderlyingRequestSubscriptionOnlyWhenAllSubscriptionsDisposed()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -467,7 +466,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldDisposeUnderlyingCommandSubscriptionOnlyWhenAllSubscriptionsDisposed()
+        public  async Task ShouldDisposeUnderlyingCommandSubscriptionOnlyWhenAllSubscriptionsDisposed()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -521,7 +520,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldDisposeUnderlyingEventSubscriptionOnlyWhenAllSubscriptionsDisposed()
+        public  async Task ShouldDisposeUnderlyingEventSubscriptionOnlyWhenAllSubscriptionsDisposed()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -575,7 +574,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldHandleUnderlyingEventSubscriptionErrorsOnTheExceptionChannel()
+        public  async Task ShouldHandleUnderlyingEventSubscriptionErrorsOnTheExceptionChannel()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -634,7 +633,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldHandleUnderlyingCommandSubscriptionErrorsOnTheExceptionChannel()
+        public  async Task ShouldHandleUnderlyingCommandSubscriptionErrorsOnTheExceptionChannel()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -693,7 +692,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldHandleUnderlyingRequestSubscriptionErrorsOnTheExceptionChannel()
+        public  async Task ShouldHandleUnderlyingRequestSubscriptionErrorsOnTheExceptionChannel()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -752,7 +751,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldSendCommandsToCorrectEndpoints()
+        public  async Task ShouldSendCommandsToCorrectEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -770,13 +769,13 @@ namespace Obvs.Tests
 
             IServiceBus serviceBus = new ServiceBus(new[] { serviceEndpointClient1, serviceEndpointClient2, serviceEndpointClient3 }, new[] { serviceEndpoint1, serviceEndpoint2 });
             
-            serviceBus.SendAsync(command1);
+            await serviceBus.SendAsync(command1);
 
             A.CallTo(() => serviceEndpointClient1.SendAsync(command1)).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => serviceEndpointClient2.SendAsync(command1)).MustNotHaveHappened();
             A.CallTo(() => serviceEndpointClient3.SendAsync(command1)).MustHaveHappened(Repeated.Exactly.Once);
-            
-            serviceBus.SendAsync(new[]{command2, command3});
+
+            await serviceBus.SendAsync(new[]{command2, command3});
 
             A.CallTo(() => serviceEndpointClient1.SendAsync(command2)).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => serviceEndpointClient2.SendAsync(command2)).MustNotHaveHappened();
@@ -788,7 +787,7 @@ namespace Obvs.Tests
         } 
         
         [Fact]
-        public void ShouldSendRequestsToCorrectEndpoints()
+        public  async Task ShouldSendRequestsToCorrectEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -821,7 +820,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldCompleteGetResponseWhenOneResponseReturned()
+        public  async Task ShouldCompleteGetResponseWhenOneResponseReturned()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpointClient serviceEndpointClient1 = A.Fake<IServiceEndpointClient>();
@@ -852,7 +851,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldPublishEventsToCorrectEndpoints()
+        public  async Task ShouldPublishEventsToCorrectEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -867,8 +866,8 @@ namespace Obvs.Tests
             A.CallTo(() => serviceEndpoint3.CanHandle(ev)).Returns(true);
 
             IServiceBus serviceBus = new ServiceBus(new[] { serviceEndpointClient1, serviceEndpointClient2 }, new[] { serviceEndpoint1, serviceEndpoint2, serviceEndpoint3 });
-            
-            serviceBus.PublishAsync(ev);
+
+            await serviceBus.PublishAsync(ev);
 
             A.CallTo(() => serviceEndpoint1.PublishAsync(ev)).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => serviceEndpoint2.PublishAsync(ev)).MustNotHaveHappened();
@@ -876,7 +875,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldSendResponsesToCorrectEndpoints()
+        public  async Task ShouldSendResponsesToCorrectEndpoints()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -893,7 +892,7 @@ namespace Obvs.Tests
 
             IServiceBus serviceBus = new ServiceBus(new[] { serviceEndpointClient1, serviceEndpointClient2 }, new[] { serviceEndpoint1, serviceEndpoint2, serviceEndpoint3 });
 
-            serviceBus.ReplyAsync(request, response);
+            await serviceBus.ReplyAsync(request, response);
 
             A.CallTo(() => serviceEndpoint1.ReplyAsync(request, response)).MustHaveHappened(Repeated.Exactly.Once);
             A.CallTo(() => serviceEndpoint2.ReplyAsync(request, response)).MustNotHaveHappened();
@@ -901,7 +900,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldSetRequestIdsOnRequestsWhenUsingDefaultRequestCorrelationProvider()
+        public  async Task ShouldSetRequestIdsOnRequestsWhenUsingDefaultRequestCorrelationProvider()
         {
             const string requestId = "MyOwnRequestId";
 
@@ -947,7 +946,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldAttemptToSendCommandToAllEndpointsWhenExceptionsAreThrown()
+        public async Task ShouldAttemptToSendCommandToAllEndpointsWhenExceptionsAreThrown()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -972,7 +971,7 @@ namespace Obvs.Tests
             AggregateException aggregateException = null;
             try
             {
-                serviceBus.SendAsync(new[] {command, command2});
+                await serviceBus.SendAsync(new[] {command, command2});
             }
             catch (AggregateException ex)
             {
@@ -989,7 +988,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldAttemptToPublishEventToAllEndpointsWhenExceptionsAreThrown()
+        public async Task ShouldAttemptToPublishEventToAllEndpointsWhenExceptionsAreThrown()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -1013,7 +1012,7 @@ namespace Obvs.Tests
             AggregateException aggregateException = null;
             try
             {
-                serviceBus.PublishAsync(ev);
+                await serviceBus.PublishAsync(ev);
             }
             catch (AggregateException ex)
             {
@@ -1030,7 +1029,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldAttemptToSendResponseToAllEndpointsWhenExceptionsAreThrown()
+        public async Task ShouldAttemptToSendResponseToAllEndpointsWhenExceptionsAreThrown()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -1054,7 +1053,7 @@ namespace Obvs.Tests
             
             try
             {
-                serviceBus.ReplyAsync(request, response);
+                await serviceBus.ReplyAsync(request, response);
             }
             catch (AggregateException ex)
             {
@@ -1071,7 +1070,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldDisposeEndpointsWhenDisposed()
+        public  async Task ShouldDisposeEndpointsWhenDisposed()
         {
             IServiceEndpoint serviceEndpoint1 = A.Fake<IServiceEndpoint>();
             IServiceEndpoint serviceEndpoint2 = A.Fake<IServiceEndpoint>();
@@ -1089,7 +1088,7 @@ namespace Obvs.Tests
         }
 
         [Fact]
-        public void ShouldCatchAndHandleExceptionsThrownByEndpointObservables()
+        public async Task ShouldCatchAndHandleExceptionsThrownByEndpointObservables()
         {
             FakeServiceEndpoint erroringEndpoint = new FakeServiceEndpoint(typeof(ITestServiceMessage1)) { ThrowException = true };
             FakeServiceEndpoint serviceEndpoint = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1111,24 +1110,24 @@ namespace Obvs.Tests
             serviceBus.Exceptions.Subscribe(exceptions.Add);
 
             // trigger exception
-            serviceBus.PublishAsync(new TestServiceEvent1());
+            await serviceBus.PublishAsync(new TestServiceEvent1());
 
             TestServiceEvent2 message1 = new TestServiceEvent2();
-            serviceBus.PublishAsync(message1);
+            await serviceBus.PublishAsync(message1);
 
             // trigger another exception
-            serviceBus.PublishAsync(new TestServiceEvent1());
+            await serviceBus.PublishAsync(new TestServiceEvent1());
 
             TestServiceEvent2 message2 = new TestServiceEvent2();
-            serviceBus.PublishAsync(message2);
+            await serviceBus.PublishAsync(message2);
 
-            Assert.Equal(exceptions.Count(), 2);
+            Assert.Equal(exceptions.Count, 2);
             Assert.True(messages.Contains(message1), "message1 not received");
             Assert.True(messages.Contains(message2), "message2 not received");
         }
 
         [Fact]
-        public void ShouldSendAllMessagesToSubscribers()
+        public async Task ShouldSendAllMessagesToSubscribers()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1151,16 +1150,16 @@ namespace Obvs.Tests
             var subscription = serviceBus.Subscribe(subscriber, testScheduler);
             var subscription2 = serviceBus.Subscribe(subscriber2, testScheduler);
 
-            serviceBus.PublishAsync(new TestServiceEvent1());
+            await serviceBus.PublishAsync(new TestServiceEvent1());
             testScheduler.AdvanceBy(1);
 
-            serviceBus.PublishAsync(new TestServiceEvent2());
+            await serviceBus.PublishAsync(new TestServiceEvent2());
             testScheduler.AdvanceBy(1);
 
-            serviceBus.SendAsync(new TestServiceCommand1());
+            await serviceBus.SendAsync(new TestServiceCommand1());
             testScheduler.AdvanceBy(1);
 
-            serviceBus.SendAsync(new TestServiceCommand2());
+            await serviceBus.SendAsync(new TestServiceCommand2());
             testScheduler.AdvanceBy(1);
 
             serviceEndpoint1.Messages.OnNext(new TestServiceRequest1());
@@ -1169,24 +1168,24 @@ namespace Obvs.Tests
             subscription.Dispose();
             subscription2.Dispose();
 
-            Assert.Equal(exceptions.Count(), 0);
-            Assert.Equal(subscriber.Received.Count(), 5);
-            Assert.Equal(subscriber.Received[0].GetType(), typeof(TestServiceEvent1));
-            Assert.Equal(subscriber.Received[1].GetType(), typeof(TestServiceEvent2));
-            Assert.Equal(subscriber.Received[2].GetType(), typeof(TestServiceCommand1));
-            Assert.Equal(subscriber.Received[3].GetType(), typeof(TestServiceCommand2));
-            Assert.Equal(subscriber.Received[4].GetType(), typeof(TestServiceRequest1));
+            Assert.Equal(0, exceptions.Count);
+            Assert.Equal(5, subscriber.Received.Count);
+            Assert.Equal(typeof(TestServiceEvent1), subscriber.Received[0].GetType());
+            Assert.Equal(typeof(TestServiceEvent2), subscriber.Received[1].GetType());
+            Assert.Equal(typeof(TestServiceCommand1), subscriber.Received[2].GetType());
+            Assert.Equal(typeof(TestServiceCommand2), subscriber.Received[3].GetType());
+            Assert.Equal(typeof(TestServiceRequest1), subscriber.Received[4].GetType());
             
-            Assert.Equal(subscriber2.Received.Count(), 5);
-            Assert.Equal(subscriber2.Received[0].GetType(), typeof(TestServiceEvent1));
-            Assert.Equal(subscriber2.Received[1].GetType(), typeof(TestServiceEvent2));
-            Assert.Equal(subscriber2.Received[2].GetType(), typeof(TestServiceCommand1));
-            Assert.Equal(subscriber2.Received[3].GetType(), typeof(TestServiceCommand2));
-            Assert.Equal(subscriber2.Received[4].GetType(), typeof(TestServiceRequest1));
+            Assert.Equal(5, subscriber2.Received.Count);
+            Assert.Equal(typeof(TestServiceEvent1), subscriber2.Received[0].GetType());
+            Assert.Equal(typeof(TestServiceEvent2), subscriber2.Received[1].GetType());
+            Assert.Equal(typeof(TestServiceCommand1), subscriber2.Received[2].GetType());
+            Assert.Equal(typeof(TestServiceCommand2), subscriber2.Received[3].GetType());
+            Assert.Equal(typeof(TestServiceRequest1), subscriber2.Received[4].GetType());
         }
         
         [Fact]
-        public void ShouldEmitSubscriberExceptionsOnExceptionObservable()
+        public async Task ShouldEmitSubscriberExceptionsOnExceptionObservable()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1207,26 +1206,26 @@ namespace Obvs.Tests
             var subscription = serviceBus.Subscribe(subscriber, testScheduler);
 
             subscriber.ThrowExceptions = true;
-            serviceBus.PublishAsync(new TestServiceEvent1());
+            await serviceBus.PublishAsync(new TestServiceEvent1());
             testScheduler.AdvanceBy(1);
 
-            serviceBus.PublishAsync(new TestServiceEvent2());
+            await serviceBus.PublishAsync(new TestServiceEvent2());
             testScheduler.AdvanceBy(1);
 
-            serviceBus.SendAsync(new TestServiceCommand1());
+            await serviceBus.SendAsync(new TestServiceCommand1());
             testScheduler.AdvanceBy(1);
 
-            serviceBus.SendAsync(new TestServiceCommand2());
+            await serviceBus.SendAsync(new TestServiceCommand2());
             testScheduler.AdvanceBy(1);
 
             subscription.Dispose();
 
-            Assert.Equal(exceptions.Count(), 4);
-            Assert.Equal(subscriber.Received.Count(), 0);
+            Assert.Equal(exceptions.Count, 4);
+            Assert.Equal(subscriber.Received.Count, 0);
         }
 
         [Fact]
-        public void ShouldThrowExceptionIfAlreadySubscribed()
+        public async Task ShouldThrowExceptionIfAlreadySubscribed()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1246,7 +1245,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldNotDeliverMessagesToSubscriberAfterSubscriptionDisposed()
+        public async Task ShouldNotDeliverMessagesToSubscriberAfterSubscriptionDisposed()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1270,12 +1269,12 @@ namespace Obvs.Tests
             serviceEndpoint1.Messages.OnNext(new TestServiceEvent2());
             testScheduler.AdvanceBy(1);
 
-            Assert.Equal(subscriber.Received.Count(), 1);
-            Assert.Equal(subscriber.Received[0].GetType(), typeof(TestServiceEvent1));
+            Assert.Equal(1, subscriber.Received.Count);
+            Assert.Equal(typeof(TestServiceEvent1), subscriber.Received[0].GetType());
         }
         
         [Fact]
-        public void ShouldThrowExceptionIfSubscriberIsNull()
+        public async Task ShouldThrowExceptionIfSubscriberIsNull()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1291,7 +1290,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldThrowExceptionIfSubscriberHasNoValidMessageHandlers()
+        public async Task ShouldThrowExceptionIfSubscriberHasNoValidMessageHandlers()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1307,7 +1306,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldSendAllMessagesToClientSubscribers()
+        public async Task ShouldSendAllMessagesToClientSubscribers()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1341,21 +1340,21 @@ namespace Obvs.Tests
             subscription.Dispose();
             subscription2.Dispose();
 
-            Assert.Equal(exceptions.Count(), 0);
+            Assert.Equal(exceptions.Count, 0);
 
-            Assert.Equal(subscriber.Received.Count(), 3);
+            Assert.Equal(subscriber.Received.Count, 3);
             Assert.Equal(subscriber.Received[0].GetType(), typeof(TestServiceEvent1));
             Assert.Equal(subscriber.Received[1].GetType(), typeof(TestServiceEvent2));
             Assert.Equal(subscriber.Received[2].GetType(), typeof(TestServiceEventBase));
             
-            Assert.Equal(subscriber2.Received.Count(), 3);
+            Assert.Equal(subscriber2.Received.Count, 3);
             Assert.Equal(subscriber2.Received[0].GetType(), typeof(TestServiceEvent1));
             Assert.Equal(subscriber2.Received[1].GetType(), typeof(TestServiceEvent2));
             Assert.Equal(subscriber2.Received[2].GetType(), typeof(TestServiceEventBase));
         }
         
         [Fact]
-        public void ShouldDeliverAllMessagesFromEndpointsWithoutLoggingEnabled()
+        public async Task ShouldDeliverAllMessagesFromEndpointsWithoutLoggingEnabled()
         {
             FakeServiceEndpoint serviceEndpoint1 = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint serviceEndpoint2 = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1377,15 +1376,15 @@ namespace Obvs.Tests
             serviceEndpoint1.Messages.OnNext(new TestServiceEvent1());
             serviceEndpoint1.Messages.OnNext(new TestServiceCommand1());
 
-            Assert.Equal(exceptions.Count(), 0);
-            Assert.Equal(messages.Count(), 2);
+            Assert.Equal(exceptions.Count, 0);
+            Assert.Equal(messages.Count, 2);
             Assert.Equal(messages[0].GetType(), typeof(TestServiceEvent1));
             Assert.Equal(messages[1].GetType(), typeof(TestServiceCommand1));
             
         }
 
         [Fact]
-        public void ShouldPublishMessagesToLocalBusWhenConfigured()
+        public  async Task ShouldPublishMessagesToLocalBusWhenConfigured()
         {
             FakeServiceEndpoint fakeServiceEndpoint = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint fakeServer = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1416,21 +1415,21 @@ namespace Obvs.Tests
 
             serviceBus.GetResponses(new TestServiceRequest1()).Subscribe(serviceBusMessages.Add);
             serviceBus.GetResponses(new TestServiceRequest2()).Subscribe(serviceBusMessages.Add);
-            serviceBus.SendAsync(new TestServiceCommand2());
-            serviceBus.PublishAsync(new TestServiceEvent1());
-            serviceBus.SendAsync(new TestServiceCommand1());
-            serviceBus.PublishAsync(new TestEventBelongingToNoService());
+            await serviceBus.SendAsync(new TestServiceCommand2());
+            await serviceBus.PublishAsync(new TestServiceEvent1());
+            await serviceBus.SendAsync(new TestServiceCommand1());
+            await serviceBus.PublishAsync(new TestEventBelongingToNoService());
 
-            Assert.Equal(exceptions.Count(), 0);
+            Assert.Equal(exceptions.Count, 0);
 
-            Assert.Equal(localBusMessages.Count(), 5);
+            Assert.Equal(localBusMessages.Count, 5);
             Assert.Equal(localBusMessages[0].GetType(), typeof(TestServiceResponse1));
             Assert.Equal(localBusMessages[1].GetType(), typeof(TestServiceRequest1));
             Assert.Equal(localBusMessages[2].GetType(), typeof(TestServiceEvent1));
             Assert.Equal(localBusMessages[3].GetType(), typeof(TestServiceCommand1));
             Assert.Equal(localBusMessages[4].GetType(), typeof(TestEventBelongingToNoService));
 
-            Assert.Equal(serviceBusMessages.Count(), 7);
+            Assert.Equal(serviceBusMessages.Count, 7);
             Assert.Equal(serviceBusMessages[0].GetType(), typeof(TestServiceRequest1)); // locally published
             Assert.Equal(serviceBusMessages[1].GetType(), typeof(TestServiceResponse1)); // locally published
             Assert.Equal(serviceBusMessages[2].GetType(), typeof(TestServiceResponse2));
@@ -1442,7 +1441,7 @@ namespace Obvs.Tests
         }
         
         [Fact]
-        public void ShouldPublishMessagesWithNoEndpointToLocalBusWhenConfigured()
+        public  async Task ShouldPublishMessagesWithNoEndpointToLocalBusWhenConfigured()
         {
             FakeServiceEndpoint fakeServiceEndpoint = new FakeServiceEndpoint(typeof(ITestServiceMessage1));
             FakeServiceEndpoint fakeServer = new FakeServiceEndpoint(typeof(ITestServiceMessage2));
@@ -1477,16 +1476,16 @@ namespace Obvs.Tests
 
             serviceBus.GetResponses(new TestServiceRequest1()).Subscribe(serviceBusMessages.Add);
             serviceBus.GetResponses(new TestServiceRequest2()).Subscribe(serviceBusMessages.Add);
-            serviceBus.SendAsync(new TestServiceCommand2());
-            serviceBus.PublishAsync(new TestServiceEvent1());
-            serviceBus.PublishAsync(new TestEventBelongingToNoService());
+            await serviceBus.SendAsync(new TestServiceCommand2());
+            await serviceBus.PublishAsync(new TestServiceEvent1());
+            await serviceBus.PublishAsync(new TestEventBelongingToNoService());
 
-            Assert.Equal(exceptions.Count(), 0);
+            Assert.Equal(exceptions.Count, 0);
 
-            Assert.Equal(localBusMessages.Count(), 1);
+            Assert.Equal(localBusMessages.Count, 1);
             Assert.Equal(localBusMessages[0].GetType(), typeof(TestEventBelongingToNoService));
 
-            Assert.Equal(serviceBusMessages.Count(), 3);
+            Assert.Equal(serviceBusMessages.Count, 3);
             Assert.Equal(serviceBusMessages[0].GetType(), typeof(TestServiceResponse2));
             Assert.Equal(serviceBusMessages[1].GetType(), typeof(TestServiceEvent2));
             Assert.Equal(serviceBusMessages[2].GetType(), typeof(TestEventBelongingToNoService)); // locally published
@@ -1579,106 +1578,5 @@ namespace Obvs.Tests
         public string RequestId { get; set; }
         public string RequesterId { get; set; }
     }
-
-    public class FakeSubscriber
-    {
-        public readonly List<IMessage> Received = new List<IMessage>();
-        public bool ThrowExceptions { get; set; }
-
-        public void OnEvent(TestServiceEvent1 message)
-        {
-            Handle(message);
-        }
-
-        public void OnEvent(TestServiceEvent2 message)
-        {
-            Handle(message);
-        }
-
-        public void OnEvent(TestServiceEventBase message)
-        {
-            Handle(message);
-        }
-
-        public void OnCommand(TestServiceCommand1 message)
-        {
-            Handle(message);
-        }
-
-        public void OnCommand(TestServiceCommand2 message)
-        {
-            Handle(message);
-        }
-
-        public void OnCommand(TestServiceCommandBase message)
-        {
-            Handle(message);
-        }
-
-        public IObservable<IResponse> OnRequest(TestServiceRequest1 request)
-        {
-            Handle(request);
-            return Observable.Empty<IResponse>();
-        }
-
-        private void Handle(IMessage message)
-        {
-            if (ThrowExceptions)
-            {
-                throw new Exception("ThrowExceptions set to Equal");
-            }
-            Received.Add(message);
-        }
-    } 
     
-    public class FakeSubscriber2
-    {
-        public readonly List<IMessage> Received = new List<IMessage>();
-        public bool ThrowExceptions { get; set; }
-
-        public void OnEvent(TestServiceEvent1 message)
-        {
-            Handle(message);
-        }
-
-        public void OnEvent(TestServiceEvent2 message)
-        {
-            Handle(message);
-        }
-
-        public void OnEvent(TestServiceEventBase message)
-        {
-            Handle(message);
-        }
-
-        public void OnCommand(TestServiceCommand1 message)
-        {
-            Handle(message);
-        }
-
-        public void OnCommand(TestServiceCommand2 message)
-        {
-            Handle(message);
-        }
-
-        public void OnCommand(TestServiceCommandBase message)
-        {
-            Handle(message);
-        }
-
-        public IObservable<IResponse> OnRequest(TestServiceRequest1 request)
-        {
-            Handle(request);
-            return Observable.Empty<IResponse>();
-        }
-
-        private void Handle(IMessage message)
-        {
-            if (ThrowExceptions)
-            {
-                throw new Exception("ThrowExceptions set to Equal");
-            }
-            Received.Add(message);
-        }
-    }
 }

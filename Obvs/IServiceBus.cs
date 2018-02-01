@@ -44,75 +44,47 @@ namespace Obvs
             _serviceBus = serviceBus;
         }
 
-        public static ICanAddEndpoint<IMessage, ICommand, IEvent, IRequest, IResponse> Configure()
-        {
-            return new ServiceBusFluentCreator<IMessage, ICommand, IEvent, IRequest, IResponse>(new DefaultRequestCorrelationProvider());
-        }
+        public static ICanAddEndpoint<IMessage, ICommand, IEvent, IRequest, IResponse> Configure() 
+            => new ServiceBusFluentCreator<IMessage, ICommand, IEvent, IRequest, IResponse>(new DefaultRequestCorrelationProvider());
 
-        public IObservable<IEvent> Events
-        {
-            get { return _serviceBus.Events; }
-        }
+        public IObservable<IEvent> Events 
+            => _serviceBus.Events;
 
-        public Task SendAsync(ICommand command)
-        {
-            return _serviceBus.SendAsync(command);
-        }
+        public Task SendAsync(ICommand command) 
+            => _serviceBus.SendAsync(command);
 
         public Task SendAsync(IEnumerable<ICommand> commands)
-        {
-            return _serviceBus.SendAsync(commands);
-        }
+            => _serviceBus.SendAsync(commands);
 
         public IObservable<IResponse> GetResponses(IRequest request)
-        {
-            return _serviceBus.GetResponses(request);
-        }
+            => _serviceBus.GetResponses(request);
 
-        public IObservable<T> GetResponses<T>(IRequest request) where T : IResponse
-        {
-            return _serviceBus.GetResponses<T>(request);
-        }
+        public IObservable<T> GetResponses<T>(IRequest request) where T : IResponse 
+            => _serviceBus.GetResponses<T>(request);
 
-        public IObservable<T> GetResponse<T>(IRequest request) where T : IResponse
-        {
-            return _serviceBus.GetResponse<T>(request);
-        }
+        public IObservable<T> GetResponse<T>(IRequest request) where T : IResponse 
+            => _serviceBus.GetResponse<T>(request);
 
-        public IObservable<Exception> Exceptions
-        {
-            get { return _serviceBus.Exceptions; }
-        }
+        public IObservable<Exception> Exceptions 
+            => _serviceBus.Exceptions;
 
-        public IDisposable Subscribe(object subscriber, IScheduler scheduler = null)
-        {
-            return _serviceBus.Subscribe(subscriber, scheduler);
-        }
+        public IDisposable Subscribe(object subscriber, IScheduler scheduler = null) 
+            => _serviceBus.Subscribe(subscriber, scheduler);
 
-        public IObservable<IRequest> Requests
-        {
-            get { return _serviceBus.Requests; }
-        }
+        public IObservable<IRequest> Requests 
+            => _serviceBus.Requests;
 
-        public IObservable<ICommand> Commands
-        {
-            get { return _serviceBus.Commands; }
-        }
+        public IObservable<ICommand> Commands 
+            => _serviceBus.Commands;
 
-        public Task PublishAsync(IEvent ev)
-        {
-            return _serviceBus.PublishAsync(ev);
-        }
+        public Task PublishAsync(IEvent ev) 
+            => _serviceBus.PublishAsync(ev);
 
         public Task ReplyAsync(IRequest request, IResponse response)
-        {
-            return _serviceBus.ReplyAsync(request, response);
-        }
+            => _serviceBus.ReplyAsync(request, response);
 
-        public void Dispose()
-        {
-            ((IDisposable)_serviceBus).Dispose();
-        }
+        public void Dispose() 
+            => ((IDisposable)_serviceBus).Dispose();
     }
 
     public class ServiceBus<TMessage, TCommand, TEvent, TRequest, TResponse> : 
@@ -124,9 +96,7 @@ namespace Obvs
         where TResponse : class, TMessage
     {
         private readonly IRequestCorrelationProvider<TRequest, TResponse> _requestCorrelationProvider;
-        private readonly IObservable<TRequest> _requests;
-        private readonly IObservable<TCommand> _commands;
-        
+
         public ServiceBus(IEnumerable<IServiceEndpointClient<TMessage, TCommand, TEvent, TRequest, TResponse>> endpointClients, 
                           IEnumerable<IServiceEndpoint<TMessage, TCommand, TEvent, TRequest, TResponse>> endpoints, 
                           IRequestCorrelationProvider<TRequest, TResponse> requestCorrelationProvider, 
@@ -135,52 +105,46 @@ namespace Obvs
         {
             _requestCorrelationProvider = requestCorrelationProvider;
 
-            _requests = Endpoints
-                .Select(endpoint => endpoint.RequestsWithErrorHandling(_exceptions))
-                .Merge()
+            Requests = Endpoints
+                .Select(endpoint => endpoint.RequestsWithErrorHandling(_exceptions)).Merge()
                 .Merge(GetLocalMessages<TRequest>())
                 .PublishRefCountRetriable();
 
-            _commands = Endpoints
-                .Select(endpoint => endpoint.CommandsWithErrorHandling(_exceptions))
-                .Merge()
+            Commands = Endpoints
+                .Select(endpoint => endpoint.CommandsWithErrorHandling(_exceptions)).Merge()
                 .Merge(GetLocalMessages<TCommand>())
                 .PublishRefCountRetriable();
         }
 
-        public IObservable<TRequest> Requests
-        {
-            get { return _requests; }
-        }
+        public IObservable<TRequest> Requests { get; }
 
-        public IObservable<TCommand> Commands
-        {
-            get { return _commands; }
-        }
+        public IObservable<TCommand> Commands { get; }
 
-        public Task PublishAsync(TEvent ev)
+        public async Task PublishAsync(TEvent ev)
         {
             List<Exception> exceptions = new List<Exception>();
 
             var tasks = EndpointsThatCanHandle(ev)
-                .Select(endpoint => Catch(() => endpoint.PublishAsync(ev), exceptions, EventErrorMessage(endpoint)))
-                .Union(PublishLocal(ev, exceptions))
+                .Select(endpoint => CatchAsync(() => endpoint.PublishAsync(ev), exceptions, EventErrorMessage(endpoint)))
+                .Concat(PublishLocal(ev, exceptions))
                 .ToArray();
+
+
+            if (tasks.Length == 0)
+            {
+                throw new Exception(
+                    $"No endpoint or local bus configured for {ev}, please check your ServiceBus configuration.");
+            }
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             if (exceptions.Any())
             {
                 throw new AggregateException(EventErrorMessage(ev), exceptions);
             }
-
-            if (tasks.Length == 0)
-            {
-                throw new Exception(string.Format("No endpoint or local bus configured for {0}, please check your ServiceBus configuration.", ev));
-            }
-
-            return Task.WhenAll(tasks);
         }
 
-        public Task ReplyAsync(TRequest request, TResponse response)
+        public async Task ReplyAsync(TRequest request, TResponse response)
         {
             if (_requestCorrelationProvider == null)
             {
@@ -192,16 +156,17 @@ namespace Obvs
             List<Exception> exceptions = new List<Exception>();
 
             var tasks = EndpointsThatCanHandle(response)
-                    .Select(endpoint => Catch(() => endpoint.ReplyAsync(request, response), exceptions, ReplyErrorMessage(endpoint)))
-                    .Union(PublishLocal(response, exceptions))
+                    .Select(endpoint => CatchAsync(() => endpoint.ReplyAsync(request, response), exceptions, ReplyErrorMessage(endpoint)))
+                    .Concat(PublishLocal(response, exceptions))
                     .ToArray();
+
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
 
             if (exceptions.Any())
             {
                 throw new AggregateException(ReplyErrorMessage(request, response), exceptions);
             }
-
-            return Task.WhenAll(tasks);
         }
 
         public static ICanAddEndpoint<TMessage, TCommand, TEvent, TRequest, TResponse> Configure()
@@ -225,10 +190,11 @@ namespace Obvs
 
         public override IDisposable Subscribe(object subscriber, IScheduler scheduler = null)
         {
-            IObservable<TMessage> messages = (Commands as IObservable<TMessage>).Merge(Events);
-            Action<TRequest, TResponse> onReply = (request, response) => ReplyAsync(request, response);
+            void OnReply(TRequest request, TResponse response) => ReplyAsync(request, response);
 
-            return Subscribe(subscriber, messages, scheduler, Requests, onReply);
+            IObservable<TMessage> messages = (Commands as IObservable<TMessage>).Merge(Events);
+
+            return Subscribe(subscriber, messages, scheduler, Requests, OnReply);
         }
     }
 }

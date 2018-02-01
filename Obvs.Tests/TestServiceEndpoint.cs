@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Obvs.Tests
 {
-    
     public class TestServiceEndpoint
     {
         [Fact]
